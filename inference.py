@@ -30,6 +30,8 @@ def get_class_names():
 def save_to_db(img_id, detected_classes, bathroom_type):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    # Delete previous entries for this img_id to avoid duplicates
+    cursor.execute('DELETE FROM detections WHERE img_id = ?', (img_id,))
     for class_name in detected_classes:
         cursor.execute('''
             INSERT INTO detections (img_id, class_name, hierarchy)
@@ -39,6 +41,13 @@ def save_to_db(img_id, detected_classes, bathroom_type):
     conn.close()
 
 def save_image_to_structure(img_id, bathroom_type, detected_classes, image_path):
+    # Remove any previous instances of this img_id in the directory structure
+    for root, dirs, files in os.walk(SAVE_ROOT):
+        for file in files:
+            if file.startswith(img_id):
+                os.remove(os.path.join(root, file))
+
+    # Save to new directory structure
     for class_name in detected_classes:
         dir_path = os.path.join(SAVE_ROOT, bathroom_type, class_name)
         os.makedirs(dir_path, exist_ok=True)
@@ -56,17 +65,14 @@ def run_full_pipeline(pil_image):
     # Detection
     detected_classes = detect_objects(temp_path)
 
-    # Save and record
-    save_image_to_structure(img_id, bathroom_type, detected_classes, pil_image)
-    save_to_db(img_id, detected_classes, bathroom_type)
-
-    os.remove(temp_path)
-
+    # Do NOT save to DB or directory structure here
+    # Return the temp_path for later use
     return {
         "img_id": img_id,
         "bathroom_type": bathroom_type,
         "confidence": confidence,
-        "detected_objects": detected_classes
+        "detected_objects": detected_classes,
+        "temp_path": temp_path
     }
 
 def search_images(keyword):
