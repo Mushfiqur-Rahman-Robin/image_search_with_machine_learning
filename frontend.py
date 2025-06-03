@@ -1,7 +1,9 @@
 import os
+
 import streamlit as st
 from PIL import Image
-from inference import run_full_pipeline, search_images, init_db, get_class_names
+
+from inference import get_class_names, init_db, run_full_pipeline, search_images
 
 # Page setup: centered layout instead of wide
 st.set_page_config(page_title="🛁 Bathroom Image Classifier", layout="centered")
@@ -30,7 +32,8 @@ with tab1:
         st.image(img, caption="Uploaded Image", use_container_width=True)
 
         # Run inference immediately after upload (no button)
-        if st.session_state.result is None or uploaded_file != st.session_state.get('last_uploaded_file', None):
+        if st.session_state.result is None or \
+            uploaded_file != st.session_state.get('last_uploaded_file', None):
             with st.spinner("Running detection and classification..."):
                 result = run_full_pipeline(img)
                 # Deduplicate detected objects
@@ -56,7 +59,10 @@ with tab1:
                 if st.button("✅ Confirm Type", key="confirm_type"):
                     st.session_state.confirmed['bathroom_type'] = True
                 else:
-                    new_type = st.selectbox("Change Type", class_names, index=class_names.index(result['bathroom_type']), key="select_bathroom_type")
+                    new_type = st.selectbox("Change Type", \
+                                            class_names, \
+                                            index=class_names.index(result['bathroom_type']), \
+                                            key="select_bathroom_type")
                     result['bathroom_type'] = new_type
 
         st.divider()
@@ -96,7 +102,11 @@ with tab2:
             if matches:
                 page_size = 10
                 total_pages = (len(matches) + page_size - 1) // page_size
-                page = st.number_input("Page", min_value=1, max_value=total_pages, value=1, key="page_input")
+                page = st.number_input("Page", \
+                                       min_value=1, \
+                                       max_value=total_pages, \
+                                       value=1, \
+                                       key="page_input")
                 start = (page - 1) * page_size
                 end = start + page_size
                 st.markdown("### Search Results:")

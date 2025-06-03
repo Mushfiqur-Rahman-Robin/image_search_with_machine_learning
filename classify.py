@@ -1,8 +1,7 @@
+import numpy as np
+from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.applications.vgg16 import preprocess_input
-from PIL import Image
-import numpy as np
 
 # Load model once
 vgg_model = load_model("models/vgg16_bathroom_classifier.h5")

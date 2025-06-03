@@ -1,9 +1,9 @@
-import uuid
 import os
 import sqlite3
-from PIL import Image
+import uuid
 
-from classify import classify_image, class_names as classification_class_names
+from classify import class_names as classification_class_names
+from classify import classify_image
 from detect import detect_objects
 
 DB_PATH = "detections.db"
