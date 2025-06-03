@@ -71,6 +71,7 @@ referencing==0.36.2
 requests==2.32.3
 rich==14.0.0
 rpds-py==0.25.1
+ruff==0.11.12
 scipy==1.15.3
 setuptools==80.9.0
 six==1.17.0
