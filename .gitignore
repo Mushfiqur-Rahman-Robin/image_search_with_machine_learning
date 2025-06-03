@@ -12,3 +12,4 @@ models/
 images/
 output_images/
 detections.db
+.ruff_cache/
