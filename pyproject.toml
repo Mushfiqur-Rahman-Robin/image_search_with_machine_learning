@@ -1,11 +1,43 @@
 [project]
 name = "br-demo"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple image search prototype with machine learning"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "ruff>=0.11.12",
     "streamlit>=1.45.1",
     "tensorflow>=2.19.0",
     "ultralytics>=8.3.148",
 ]
+
+
+[tool.ruff]
+target-version = "py312"
+
+select = [
+    "F",    # Pyflakes (logic errors)
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "I",    # isort (import sorting)
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "C90",  # complexity (McCabe)
+]
+
+fixable = ["F", "E", "W", "I", "UP", "N"]
+
+exclude = [
+    ".git",
+    ".venv",
+    "env",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    ".mypy_cache",
+    ".pytest_cache"
+]
+
+line-length = 105
+indent-width = 4
