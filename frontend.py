@@ -1,11 +1,8 @@
-import os
-
 import streamlit as st
 from PIL import Image
 
 from inference import get_class_names, init_db, run_full_pipeline, search_images
 
-# Page setup: centered layout instead of wide
 st.set_page_config(page_title="🛁 Bathroom Image Classifier", layout="centered")
 st.title("🛁 Bathroom Image Classifier with YOLO + VGG16")
 
@@ -60,9 +57,9 @@ with tab1:
                     st.session_state.confirmed['bathroom_type'] = True
                 else:
                     new_type = st.selectbox("Change Type", \
-                                            class_names, \
-                                            index=class_names.index(result['bathroom_type']), \
-                                            key="select_bathroom_type")
+                                          class_names, \
+                                          index=class_names.index(result['bathroom_type']), \
+                                          key="select_bathroom_type")
                     result['bathroom_type'] = new_type
 
         st.divider()
@@ -100,6 +97,7 @@ with tab2:
         if query:
             matches = search_images(query)
             if matches:
+                # Pagination
                 page_size = 10
                 total_pages = (len(matches) + page_size - 1) // page_size
                 page = st.number_input("Page", \
@@ -109,12 +107,34 @@ with tab2:
                                        key="page_input")
                 start = (page - 1) * page_size
                 end = start + page_size
+
+                # Search Results
                 st.markdown("### Search Results:")
                 cols = st.columns(5)
                 for i, path in enumerate(matches[start:end]):
                     with cols[i % 5]:
-                        st.image(path, width=150, caption=os.path.basename(path))
+                        # Load and resize image to square
+                        img = Image.open(path).convert("RGB")
+                        size = 200
+                        # Crop to square (center crop)
+                        min_dim = min(img.size[0], img.size[1])
+                        left = (img.size[0] - min_dim) // 2
+                        top = (img.size[1] - min_dim) // 2
+                        right = (img.size[0] + min_dim) // 2
+                        bottom = (img.size[1] + min_dim) // 2
+                        img = img.crop((left, top, right, bottom))
+                        img = img.resize((size, size), Image.Resampling.LANCZOS)
+
+                        # Zoom button
+                        # if st.button("🔍 Zoom", key=f"zoom_{start + i}_{query}_{page}"):
+                        #     st.session_state.selected_image = path
+                        st.image(img, width=size, use_container_width=False)
+
+                # Display full-size image if selected
+                if 'selected_image' in st.session_state:
+                    st.markdown("### Full-Size Image")
+                    st.image(st.session_state.selected_image, width=800, use_container_width=False)
+                    if st.button("✖ Close", key=f"close_image_{query}_{page}"):
+                        st.session_state.pop('selected_image', None)
             else:
                 st.warning("No matching images found.")
-
-
